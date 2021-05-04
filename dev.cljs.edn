@@ -1,4 +1,4 @@
-{:main          bidoof.start-dev
+{:main          bidoof.start
  :optimizations :none
  :output-to     "resources/public/main.js"
  :output-dir    "resources/public/main.out"

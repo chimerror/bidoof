@@ -137,9 +137,12 @@
       (->Window window))
     (throw (Exception. "Failed to create window"))))
 
-(defn start [game window]
-  (let [handle (:handle window)
-        game (assoc game :delta-time 0 :total-time (GLFW/glfwGetTime))]
+(defn start []
+  (let [
+    window (->window)
+    handle (:handle window)
+    game (pc/->game handle)
+    game (assoc game :delta-time 0 :total-time (GLFW/glfwGetTime))]
     (GLFW/glfwShowWindow handle)
     (c/init game)
     (listen-for-events window)

@@ -11,11 +11,11 @@
   [_]
   (figwheel/-main "--build" "dev"))
 
-(require '[bidoof.start-dev])
+(require '[bidoof.start])
 
 (defmethod task "native"
   [_]
-  (bidoof.start-dev/start))
+  (bidoof.start/start))
 
 (defmethod task "repl"
   [_]
