@@ -1,6 +1,8 @@
 (ns bidoof.core
   (:require
-    [brute.entity :as br.entitiy]
+    [brute.entity :as br.entity]
+    [bidoof.cards :as bi.cards]
+    [bidoof.component :as frozboz]
     [bidoof.utils :as utils]
     [bidoof.move :as move]
     [play-cljc.gl.core :as c]
@@ -23,10 +25,16 @@
   :player-images {}
   :player-image-key :walk1}))
 
+(defonce *system (atom nil))
+
 (defn init [game]
   ;; allow transparency in images
   (gl game enable (gl game BLEND))
   (gl game blendFunc (gl game SRC_ALPHA) (gl game ONE_MINUS_SRC_ALPHA))
+  (-> (br.entity/create-system)
+      (assoc :cljc-game game)
+      (bi.cards/create-entities)
+      (as-> s (reset! *system s)))
   ;; load images and put them in the state atom
   (doseq [[k path] {:walk1 "player_walk1.png"
                     :walk2 "player_walk2.png"

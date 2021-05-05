@@ -9,7 +9,7 @@
 
 (defmethod task nil
   [_]
-  (figwheel/-main "--build" "dev"))
+  (figwheel/-main "--build" "dev" "-r"))
 
 (require '[bidoof.start])
 
