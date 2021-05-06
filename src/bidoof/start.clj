@@ -1,10 +1,9 @@
 (ns bidoof.start
   (:require [bidoof.core :as c]
             [play-cljc.gl.core :as pc])
-  (:import  [org.lwjgl.glfw GLFW Callbacks
-             GLFWCursorPosCallbackI GLFWKeyCallbackI GLFWMouseButtonCallbackI
-             GLFWCharCallbackI GLFWFramebufferSizeCallbackI GLFWWindowCloseCallbackI
-             GLFWScrollCallbackI]
+  (:import  [org.lwjgl.glfw
+              GLFW Callbacks GLFWCursorPosCallbackI GLFWKeyCallbackI GLFWMouseButtonCallbackI GLFWCharCallbackI
+              GLFWFramebufferSizeCallbackI GLFWWindowCloseCallbackI GLFWScrollCallbackI]
             [org.lwjgl.opengl GL GL33]
             [org.lwjgl.system MemoryUtil])
   (:gen-class))
