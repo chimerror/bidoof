@@ -1,21 +1,81 @@
 (ns bidoof.cards
   (:require
     [brute.entity :as br.entity]
-    [bidoof.component :as bi.component]))
+    [play-cljc.gl.core :as pc.core]
+    [play-cljc.gl.entities-2d :as pc.e2d]
+    [play-cljc.transforms :as pc.transforms]
+    [bidoof.component :as bi.component]
+    [bidoof.utils :as bi.utils]))
+
+(defrecord Card [suit rank])
+(defrecord Deck [cards])
+
+(def suit-names {
+  :spades "Spades"
+  :hearts "Hearts"
+  :diamonds "Diamonds"
+  :clubs "Clubs"})
 
 (def card-suits [:spades :hearts :diamonds :clubs])
 
-(defn get-cards []
+(def card-scaling-factor (/ 190 140))
+
+(defn prepare-card-images [system]
+  (doseq [suit card-suits
+          rank (range 1 14)]
+    (let [suit-name (suit-names suit)
+          rank-name (cond
+            (and (>= rank 2) (<= rank 10)) (str rank)
+            (== rank 1) "A"
+            (== rank 11) "J"
+            (== rank 12) "Q"
+            (== rank 13) "K")
+          image-path (str "images/cards/card" suit-name rank-name ".png")
+          game (:cljc-game system)
+          card-images (:card-images system)]
+          (bi.utils/get-image image-path
+            (fn [{:keys [data width height]}]
+              (-> (pc.e2d/->image-entity game data width height)
+                  (as-> e (pc.core/compile game e))
+                  (as-> e (swap! card-images assoc-in [suit rank] e)))))))
+  system)
+
+(defn get-cards [system]
   (for [suit card-suits
         rank (range 1 14)]
-      (bi.component/->Card suit rank)))
+    (->Card suit rank)))
 
-(defn create-deck-component []
-  (let [cards (get-cards)]
-    (bi.component/->Deck cards)))
+(defn create-deck-component [system]
+  (let [cards (shuffle (get-cards system))]
+    (->Deck cards)))
 
 (defn create-entities [system]
   (let [deck-entity (br.entity/create-entity)]
     (-> system
+        (assoc :card-images (atom {}))
+        (prepare-card-images)
         (br.entity/add-entity deck-entity)
-        (br.entity/add-component deck-entity (create-deck-component)))))
+        (as-> s (br.entity/add-component s deck-entity (create-deck-component s))))))
+
+(defn process-one-game-tick [system _]
+  (let [game (:cljc-game system)
+        game-width (bi.utils/get-width game)
+        game-height(bi.utils/get-height game)
+        card-width (/ game-width 13)
+        card-height (* card-width card-scaling-factor)
+        deck (bi.component/get-singleton-component system Deck)
+        cards (vec (:cards deck))
+        card-images (:card-images system)]
+    (doseq [current-card (range 13)
+            :let [x (* current-card card-width)
+                  card (cards current-card)
+                  suit (:suit card)
+                  rank (:rank card)
+                  card-image (get-in @card-images [suit rank])]]
+      (when card-image
+        (pc.core/render game
+          (-> card-image
+              (pc.transforms/project game-width game-height)
+              (pc.transforms/translate x 0)
+              (pc.transforms/scale card-width card-height)))))
+    system))

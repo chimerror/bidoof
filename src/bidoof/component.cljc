@@ -11,6 +11,3 @@
   ([system singleton-type component-type]
     (-> (get-singleton-entity system singleton-type)
         (as-> entity (br.entity/get-component system entity component-type)))))
-
-(defrecord Card [suit rank])
-(defrecord Deck [cards])
