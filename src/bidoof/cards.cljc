@@ -45,6 +45,10 @@
                   (as-> e (swap! card-images assoc-in [suit rank] e)))))))
   system)
 
+(defn get-card-image [system suit rank]
+  (let [card-images (:card-images system)]
+    (get-in @card-images [suit rank])))
+
 (defn get-cards [system]
   (for [suit card-suits
         rank (range 1 14)]
@@ -63,6 +67,8 @@
         (br.entity/add-entity deck-entity)
         (as-> s (br.entity/add-component s deck-entity (create-deck-component s))))))
 
+(defn get-card-order-number [suit rank] (- (* 20 (+ (.indexOf card-suits suit) 1)) (if (== rank 1) 14 rank)))
+
 (defn process-one-game-tick [system _]
   (let [game (:cljc-game system)
         game-width (bi.utils/get-width game)
@@ -70,14 +76,14 @@
         card-width (/ game-width 13)
         card-height (* card-width card-scaling-factor)
         deck (bi.component/get-singleton-component system Deck)
-        cards (vec (:cards deck))
-        card-images (:card-images system)]
+        hand (->> (:cards deck)
+                  (take 13)
+                  (sort-by #(get-card-order-number (:suit %) (:rank %)))
+                  (vec))]
     (doseq [current-card (range 13)
             :let [x (* current-card card-width)
-                  card (cards current-card)
-                  suit (:suit card)
-                  rank (:rank card)
-                  card-image (get-in @card-images [suit rank])]]
+                  card (hand current-card)
+                  card-image (get-card-image system (:suit card) (:rank card))]]
       (when card-image
         (pc.core/render game
           (-> card-image
