@@ -20,6 +20,10 @@
 
 (def card-scaling-factor (/ 190 140))
 
+(defn get-card-folder-path [suit use-four-color]
+  (cond (and use-four-color (or (identical? suit :clubs) (identical? suit :diamonds))) "images/4colorCards/card"
+        :else "images/cards/card"))
+
 (defn prepare-card-images [system]
   (doseq [suit card-suits
           rank (range 1 14)]
@@ -30,7 +34,8 @@
             (== rank 11) "J"
             (== rank 12) "Q"
             (== rank 13) "K")
-          image-path (str "images/cards/card" suit-name rank-name ".png")
+          use-four-color (:four-colors system)
+          image-path (str (get-card-folder-path suit use-four-color) suit-name rank-name ".png")
           game (:cljc-game system)
           card-images (:card-images system)]
           (bi.utils/get-image image-path
@@ -53,6 +58,7 @@
   (let [deck-entity (br.entity/create-entity)]
     (-> system
         (assoc :card-images (atom {}))
+        (assoc :four-colors true)
         (prepare-card-images)
         (br.entity/add-entity deck-entity)
         (as-> s (br.entity/add-component s deck-entity (create-deck-component s))))))
