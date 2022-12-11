@@ -49,6 +49,7 @@
   (let [card-images (:card-images system)]
     (get-in @card-images [suit rank])))
 
+#_{:clj-kondo/ignore [:unused-binding]} ;; We'll use system eventually
 (defn get-cards [system]
   (for [suit card-suits
         rank (range 1 14)]

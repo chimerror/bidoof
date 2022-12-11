@@ -31,4 +31,7 @@
         leiningen/leiningen {:mvn/version "2.9.0"}}
       :main-opts ["prod.clj"]}
     :macos {
-      :jvm-opts ["-XstartOnFirstThread"]}}}
+      :jvm-opts ["-XstartOnFirstThread"]}
+    :clj-kondo {
+      :replace-deps {clj-kondo/clj-kondo {:mvn/version "RELEASE"}}
+      :main-opts ["-m" "clj-kondo.main"]}}}

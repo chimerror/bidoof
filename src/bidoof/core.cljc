@@ -17,7 +17,9 @@
 
 (defn init [game]
   ;; allow transparency in images
+  #_{:clj-kondo/ignore [:unresolved-symbol]} ;; Kondo complains about these OpenGL symbols and I'm tired of fighting it
   (gl game enable (gl game BLEND))
+  #_{:clj-kondo/ignore [:unresolved-symbol]}
   (gl game blendFunc (gl game SRC_ALPHA) (gl game ONE_MINUS_SRC_ALPHA))
   (-> (br.entity/create-system)
       (assoc :cljc-game game)
